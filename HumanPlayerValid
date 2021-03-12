@@ -1,0 +1,38 @@
+  
+#pragma once
+#include "MyExcept.h"
+#include "Nava.h"
+class ValidareNava {
+private:
+	string msg;
+public:
+	ValidareNava()
+	{
+	}
+
+	~ValidareNava() {
+	};
+
+	void validate(Nava n,int linieMax,int coloanaMax)
+	{	
+		this->msg = "";
+		if (n.getDirectie() == "invalid")
+			msg += "Orientare invalida!\n";
+		if (n.getTip() == "invalid")
+			msg += "Tipul navei este incorect!\n";
+		if (n.getInceput() > (linieMax - 1) * 10 + coloanaMax - 1)
+			msg += "Pozitie invalida!\n";
+		if (n.getDirectie() == "orizontal")
+		{
+			if (n.getInceput() % 10 + n.getLungime() - 1 > coloanaMax - 1)
+				msg += "Pozitie invalida(nava iese din chenar)!\n";
+		}
+		else if (n.getDirectie() == "vertical")
+		{
+			if (n.getInceput() / 10 + n.getLungime() * 10 > linieMax *10)
+				msg += "Pozitie invalida(nava depaseste chenarul)!\n";
+		}
+		if (msg.length() > 1)
+			throw MyExcept(msg);
+	}
+};
