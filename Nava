@@ -1,0 +1,123 @@
+#pragma once
+#include <iostream>
+#include <vector>
+using namespace std;
+class Nava {
+private:
+	int inceput;
+	int *intacte;
+	int lungime;
+	string directie;
+public:
+	Nava()
+	{
+		inceput = 0;
+		intacte = new int[1];
+		intacte[0] = 0;
+		lungime = 0;
+		directie = "";
+	}
+
+	Nava(int i, string tip,string dir)
+	{
+		this->inceput = i;
+		this->directie = dir;
+		if (tip == "razboi")
+		{
+			intacte = new int[5];
+			intacte[0] = intacte[1] = intacte[2] = intacte[3] = intacte[4] = 1;
+			this->lungime = 5;
+		}
+		else if (tip == "yacht")
+		{
+			intacte = new int[3];
+			intacte[0] = intacte[1] = intacte[2] = 1;
+			this->lungime = 3;
+		}
+		else if (tip == "submarin")
+		{
+			intacte = new int[2];
+			intacte[0] = intacte[1] = 1;
+			this->lungime = 2;
+		}
+	}
+
+	int getIntacte()
+	{	
+		int nr = 0;
+		for (int i = 0; i < this->lungime; i++)
+			if (this->intacte[i] == 1)
+				nr++;
+		return nr;
+	}
+
+	int getLungime()
+	{
+		return this->lungime;
+	}
+
+	string getTip()
+	{
+		if (this->lungime == 5)
+			return "razboi";
+		else if (this->lungime == 3)
+			return "yacht";
+		else if (this->lungime == 2)
+			return "submarin";
+		else return "invalid";
+	}
+
+	string getDirectie()
+	{
+		if (this->directie != "orizontal" and this->directie != "vertical")
+			return "invalid";
+		return this->directie;
+	}
+
+	int getInceput()
+	{
+		return this->inceput;
+	}
+
+	vector <int> getNava()
+	{
+		vector<int> portiuni;
+		int OPortiune = this->inceput;
+		int l = this->lungime;
+		portiuni.push_back(OPortiune);
+		if(this->directie == "orizontal")
+			while (l > 1)
+			{
+				OPortiune++;
+				portiuni.push_back(OPortiune);
+				l--;
+			}
+		if(this->directie == "vertical")
+			while (l > 1)
+			{
+				OPortiune += 10;
+				portiuni.push_back(OPortiune);
+				l--;
+			}
+		return portiuni;
+	}
+
+	bool operator==(const Nava& n)
+	{
+		return (this->directie == n.directie and this->inceput == n.inceput and this->lungime == n.lungime);
+	}
+
+	Nava clone()
+	{	
+		string tip;
+		if (this->lungime == 5)
+			tip = "razboi";
+		else if (this->lungime == 3)
+			tip = "yacht";
+		else if (this->lungime == 2)
+			tip = "submarin";
+		Nava* cloneNava =	new Nava(this->inceput, tip, this->directie);
+		return *cloneNava;
+	}
+
+};
