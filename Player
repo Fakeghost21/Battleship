@@ -1,0 +1,140 @@
+#pragma once
+#include "Nava.h"
+#include <vector>
+#include <ostream>
+#include <stdlib.h>
+#include <Windows.h>
+HANDLE hCon;
+enum Color
+{
+	DARKBLUE = 1, DARKGREEN, DARKTAIL, DARKRED, DARKPINK, DARKYELLOW,
+	GRAY, DARKGRAY, BLUE, GREEN, TEAL, RED, PINK, YELLOW, WHITE
+};
+
+void setColor(Color culoare)
+{
+	if (hCon == NULL)
+		hCon = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hCon, culoare);
+}
+using namespace std;
+class Player {
+protected:
+	vector<Nava> repo;
+	vector<int> pozitiiOcupate;
+	vector<int> pozitiiLovite;
+	vector<int> pozitiiRatate;
+	int linii, coloane;
+public:
+	Player(){
+		this->linii = 0;
+		this->coloane = 0;
+	}
+
+	virtual void setLinie(int linie)
+	{
+		this->linii = linie;
+	}
+
+	virtual void setColoana(int coloana)
+	{
+		this->coloane = coloana;
+	}
+
+	virtual bool ocupat(int nr)
+	{
+		for (int i = 0; i < this->pozitiiOcupate.size(); i++)
+			if (this->pozitiiOcupate[i] == nr)
+				return true;
+		return false;
+	}
+
+	virtual void addNava(Nava,int,int) = 0;
+
+	vector<int> getOcupate()
+	{
+		return this->pozitiiOcupate;
+	}
+
+	void addPozitieLovita(int nr)
+	{
+		this->pozitiiLovite.push_back(nr);
+	}
+
+	void addPozitieRatata(int nr)
+	{
+		this->pozitiiRatate.push_back(nr);
+	}
+
+	bool ocupatLovit(int nr)
+	{
+		for (int i = 0; i < this->pozitiiLovite.size(); i++)
+			if (this->pozitiiLovite[i] == nr)
+				return true;
+		return false;
+	}
+
+	bool ocupatRatat(int nr)
+	{
+		for (int i = 0; i < this->pozitiiRatate.size(); i++)
+			if (this->pozitiiRatate[i] == nr)
+				return true;
+		return false;
+
+	}
+
+	void clearPlayer()
+	{
+		this->pozitiiLovite.clear();
+		this->pozitiiOcupate.clear();
+		this->pozitiiRatate.clear();
+		this->repo.clear();
+	}
+
+	friend ostream& operator<<(ostream& os, Player*& hp)
+	{
+		os << "  ";
+		for (int i = 0; i < hp->coloane; i++)
+			os << i + 1 << " ";
+		os << endl;
+		for (int i = 0; i < hp->linii; i++)
+		{
+			os << char(65 + i) << " ";
+			for (int j = 0; j < hp->coloane; j++)
+			{
+				if (hp->ocupat(i * 10 + j) and hp->ocupatLovit(i * 10 + j) == false and hp->ocupatRatat(i * 10 + j) == false)
+				{
+					setColor(YELLOW);
+					os << char(254) << " ";
+				}
+				else if (hp->ocupatLovit(i * 10 + j))
+				{
+					setColor(RED);
+					os << "X" << " ";
+				}
+				else if (hp->ocupatRatat(i * 10 + j))
+				{
+					setColor(GREEN);
+					os << "M" << " ";
+				}
+				else {
+					setColor(DARKBLUE);
+					os << "*" << " ";
+				}
+				setColor(GRAY);
+			}
+			os << endl;
+		}
+		return os;
+	}
+
+	bool isDestroyed()
+	{	
+		//cout << this->pozitiiLovite.size()<<" " << this->pozitiiOcupate.size() << endl;
+		if (this->pozitiiLovite.size() == this->pozitiiOcupate.size())
+			return true;
+		return false;
+	}
+
+
+};
