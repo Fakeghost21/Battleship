@@ -1,0 +1,21 @@
+#include "Nava.h"
+#include "Player.h"
+#include "HumanPlayer.h"
+#include "PcPlayer.h"
+#include "UI.h"
+#include <iostream>
+using namespace std;
+int main()
+{
+    Nava* n = new Nava(12, "raboi", "orial");
+    Nava* n2 = new Nava(54, "razboi", "vertical");
+    Nava* n3 = new Nava(71, "yacht", "orizontal");
+    Player* p = new HumanPlayer();
+    p->setColoana(9);
+    p->setLinie(9);
+    Player* pc = new PcPlayer();
+    pc->setColoana(9);
+    pc->setLinie(9);
+    UI u(p, pc);
+    u.run();
+}
