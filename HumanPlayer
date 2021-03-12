@@ -1,0 +1,18 @@
+#pragma once
+#include "Player.h"
+#include "ValidareHumanPlayer.h"
+class HumanPlayer : public Player
+{
+private:
+	ValidareNava vN;
+public:
+	void addNava(Nava n,int l,int c) throw(MyExcept)
+	{	
+		vN.validate(n, l, c);
+		this->repo.push_back(n.clone());
+		int lungime = n.getNava().size();
+		for (int i = 0; i < lungime; i++)
+			this->pozitiiOcupate.push_back(n.getNava()[i]);
+	}
+
+};
