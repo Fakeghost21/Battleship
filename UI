@@ -1,0 +1,181 @@
+#pragma once
+#include "Player.h"
+#include "HumanPlayer.h"
+#include "PcPlayer.h"
+#include <string>
+#include <iostream>
+#include <random>
+#include <time.h>
+using namespace std;
+class UI {
+private:
+	Player* ph;
+	Player* pc;
+
+	int creeazaAtacRandom(int l, int c)
+	{
+		int linie, coloana;
+		do {
+			srand(time(0));
+			linie = rand() % (l - 1);
+			coloana = rand() % (c - 1);
+		} while (this->ph->ocupatLovit(linie * 10 + coloana) or this->ph->ocupatRatat(linie*10 +coloana));
+		return linie * 10 + coloana;
+	}
+
+	void adaugare(int l,int c)
+	{	
+		int nr = 0, linie, coloana;
+		string punct;
+		string option, orientare, type;
+		this->pc->setColoana(c);
+		this->pc->setLinie(l);
+		this->ph->setColoana(c);
+		this->ph->setLinie(l);
+		system("cls");
+		cout << this->ph << endl << this->pc << endl;
+		cout << "Add : ";
+		cin >> punct;
+		linie = (int)punct[0] - 65;
+		coloana = (int)punct[1] - 48;
+		if (punct.size() > 2)
+			coloana = coloana * 10 + (int)punct[3] - 1;
+		else coloana--;
+		cout << "Orientarea(orizontal/vertical) : ";
+		cin >> orientare;
+		cout << "Tipul navei : ";
+		cin >> type;
+		Nava n(linie * 10 + coloana, type, orientare);
+		cout << n.getDirectie() << " " << n.getTip() << endl;
+		try {
+			this->ph->addNava(n, l, c);
+			this->pc->addNava(n, l, c);
+		}
+		catch (MyExcept msg)
+		{
+			cout << msg.getMsg() << endl;
+		}
+
+	}
+
+	int citireAtac(int l,int c)
+	{
+		try {
+			string atac;
+			int linie = 0, coloana = 0;
+			cout << "Atac : ";
+			cin >> atac;
+			linie = (int)atac[0] - 65;
+			coloana = (int)atac[1] - 48;
+			if (atac.size() > 2)
+				coloana = coloana * 10 + (int)atac[3] - 1;
+			else coloana--;
+			if ((linie >= l or linie < 0) or (coloana >= c or coloana < 0))
+				throw MyExcept("Pozitie invalida!");
+			else return linie * 10 + coloana;
+		}
+		catch (MyExcept & msg)
+		{
+			cout << msg.getMsg() << endl;
+			return this->citireAtac(l,c);
+		}
+	}
+
+	void startGame(int linii,int coloane)
+	{	
+		string atac;
+		int atacRandom;
+		int linie = 0, coloana = 0;
+		int atacPc = 0;
+		Player* diagrama = new PcPlayer();
+		diagrama->setLinie(linii); diagrama->setColoana(coloane);
+		do {
+			system("cls");
+			cout << this->ph << endl << diagrama << endl;
+			atacPc = this->citireAtac(linii, coloane);
+			//string atac;
+			//int linie = 0, coloana = 0;
+			//cout << "Atac : ";
+			//cin >> atac;
+			//linie = (int)atac[0] - 65;
+			//coloana = (int)atac[1] - 48;
+			//if (atac.size() > 2)
+			//	coloana = coloana * 10 + (int)atac[3] - 1;
+			//else coloana--;
+			atacRandom = this->creeazaAtacRandom(linii, coloane);
+			if (this->ph->ocupat(atacRandom))
+			{
+				this->ph->addPozitieLovita(atacRandom);
+			}
+			else {
+				this->ph->addPozitieRatata(atacRandom);
+			}
+			if (this->pc->ocupat(atacPc))
+			{
+				this->pc->addPozitieLovita(atacPc);
+				diagrama->addPozitieLovita(atacPc);
+			}
+			else {
+				this->pc->addPozitieRatata(atacPc);
+				diagrama->addPozitieRatata(atacPc);
+			}
+		} while (this->pc->isDestroyed() == false and this->ph->isDestroyed() == false);
+		cout << this->ph << endl << diagrama << endl;
+
+	}
+	
+	void menuAdaugarePlayer()
+	{
+		int nr = 0,linie,coloana;
+		string punct;
+		string option, orientare, type;
+		cout << "linii : ";
+		cin >> linie;
+		cout << "coloane : ";
+		cin >> coloana;
+		while (true)
+		{
+			cout << "1.Add\n"
+				<< "2.Start the game\n"
+				<< "x.Exit!\n";
+			cin >> option;
+			if (option == "1")
+			{	
+				this->adaugare(linie, coloana);
+			}
+			if (option == "2")
+			{	
+				this->startGame(linie, coloana);
+				if (this->pc->isDestroyed())
+				{
+					cout << "Ati castigat!" << endl;
+					this->pc->clearPlayer();
+					this->ph->clearPlayer();
+				}
+				else {
+					cout << "Computerul a castigat!" << endl;
+					this->pc->clearPlayer();
+					this->ph->clearPlayer();
+				}
+			}
+			if (option == "x")
+			{
+				cout << "Ati iesit din joc!\n";
+				break;
+			}
+		}
+	}
+public:
+	UI(Player* PH, Player* PC)
+	{
+		this->ph = PH;
+		this->pc = PC;
+	}
+
+	~UI(){};
+
+	void run()
+	{
+		this->menuAdaugarePlayer();
+	}
+};
