@@ -1,0 +1,84 @@
+#pragma once
+#include "Player.h"
+#include <time.h>
+#include <random>
+class PcPlayer : public Player
+{
+private:
+
+	bool verificarePCrand(int linie, int coloana, string directie, int lungime, int MaxLinii, int MaxColoane)
+	{
+		int nr = linie * 10 + coloana;
+		if (directie == "orizontal")
+		{
+			if (coloana + lungime > MaxColoane)
+				return false;
+			else {
+				while (lungime)
+				{
+					//cout << nr << endl << endl;
+					if (this->ocupat(nr))
+						return false;
+					nr++;
+					lungime--;
+				}
+			}
+		}
+		else {
+			if (linie + lungime > MaxLinii)
+				return false;
+			else {
+				while (lungime)
+				{
+					//cout << nr << endl << endl;
+					if (this->ocupat(nr))
+						return false;
+					nr += 10;
+					lungime--;
+				}
+			}
+		}
+		return true;
+	}
+
+	void naveRandom(string type, int MaxLinie, int MaxColoana)
+	{
+		int linie, coloana;
+		string directie;
+		int lungime = 0;
+		if (type == "razboi")
+			lungime = 5;
+		else if (type == "yacht")
+			lungime = 3;
+		else if (type == "submarin")
+			lungime = 2;
+		int d = 0;
+		srand(time(0));
+		do {
+			linie = rand() % (MaxLinie - 1);
+			coloana = rand() % (MaxColoana - 1);
+			d = rand() % 5;
+			if (d % 2)
+				directie = "vertical";
+			else directie = "orizontal";
+		} while (this->verificarePCrand(linie, coloana, directie, lungime, MaxLinie, MaxColoana) == false);
+		Nava n(linie * 10 + coloana, type, directie);
+		this->repo.push_back(n.clone());
+		vector<int> v = n.getNava();
+		for (int i = 0; i < lungime; i++)
+			this->pozitiiOcupate.push_back(v[i]);
+	}
+
+public:
+	void addNava(Nava n,int l,int c)
+	{
+		string type;
+		if (n.getLungime() == 5)
+			type = "razboi";
+		else if (n.getLungime() == 3)
+			type = "yacht";
+		else type = "submarin";
+		this->naveRandom(type, l, c);
+	}
+
+};
